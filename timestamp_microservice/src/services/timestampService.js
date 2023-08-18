@@ -12,7 +12,7 @@ module.exports = {
             let utc = dateObj.toUTCString();
             return ({ unix: unix, utc: utc });
         } else if (checkTimestampValitidy(date)) {
-            let dateObj = new Date(date * 1000);
+            let dateObj = new Date(parseInt(date));
             let unix = dateObj.getTime();
             let utc = dateObj.toUTCString();
             return ({ unix: unix, utc: utc });
