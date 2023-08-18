@@ -15,7 +15,7 @@ app.get("/", function (req, res) {
 });
 
 
-app.get("/api/usage", function (req, res) {
+app.get("/api/usage", function (req, res) { 
   res.sendFile(__dirname + '/views/index.html');
 });
 
@@ -24,7 +24,13 @@ app.get("/api/:date?", function (req, res) {
   let dateObj = new Date(date);
   let unix = dateObj.getTime();
   let utc = dateObj.toUTCString();
-  if (dateObj == "Invalid Date") {
+
+  if (date == undefined) {
+    let dateObj = new Date();
+    let unix = dateObj.getTime();
+    let utc = dateObj.toUTCString();
+    res.json({ unix: unix, utc: utc });
+  } else if(dateObj == "Invalid Date") {
     res.json({ error: "Invalid Date" });
   } else {
     res.json({ unix: unix, utc: utc });
