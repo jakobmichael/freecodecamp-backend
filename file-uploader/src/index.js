@@ -32,16 +32,25 @@ app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
+const multer = require("multer");
+const fs = require("fs");
+const path = require("path");
+const upload = multer({
+    dest: "uploads/" // "uploads"
+});
+
 const File = mongoose.model('File', fileSchema);
 
-app.post('/api/fileanalyse', bodyParser.raw({ type: 'multipart/form-data' }), function (req, res) {
-  const file = req.files.upfile;
-  const fileObj = {
-    name: file.name,
-    type: file.mimetype,
-    size: file.size
-  }
-  const newFile = new File(fileObj);
+app.post('/api/fileanalyse', upload.single(), function (req, res) {
+  const file = req.file;
+  const name = file.originalname;
+  const type = file.mimetype;
+  const size = file.size;
+  const newFile = new File({
+    name: name,
+    type: type,
+    size: size
+  });
   newFile.save()
   .then(file => {
     res.json({
