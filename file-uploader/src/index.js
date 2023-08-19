@@ -8,8 +8,6 @@ app.use(cors());
 app.use("/public", express.static(process.cwd() + "/public"));
 
 const bodyParser = require("body-parser");
-const dns = require("dns");
-const url = require("url");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -31,16 +29,14 @@ app.get("/", function (req, res) {
   res.sendFile(process.cwd() + "/src/views/index.html");
 });
 
-const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
-const upload = multer({
-    dest: "uploads/" // "uploads"
-});
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 
 const File = mongoose.model('File', fileSchema);
 
-app.post('/api/fileanalyse', upload.single(), function (req, res) {
+
+app.post('/api/fileanalyse', upload.single('upfile'), (req, res) => {
   const file = req.file;
   const name = file.originalname;
   const type = file.mimetype;
@@ -49,30 +45,19 @@ app.post('/api/fileanalyse', upload.single(), function (req, res) {
     name: name,
     type: type,
     size: size
-  });
+    });
   newFile.save()
-  .then(file => {
-    res.json({
-      name: file.name,
-      type: file.mimetype,
-      size: file.size,
+    .then((file) => {
+      res.json({
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        id: file._id,
+      });
     })
-    const newFile = new File(fileObj);
-    newFile
-      .save()
-      .then((file) => {
-        res.json({
-          name: file.name,
-          type: file.type,
-          size: file.size,
-          id: file._id,
-        });
-      })
-      .catch((err) => console.log(err));
-  })
-  .catch(err => console.log(err));
-}
-);
+    .catch((err) => console.log(err));
+});
+
 
 app.get("/api/fileanalyse", function (req, res) {
   res.json({ error: "No file uploaded" });
